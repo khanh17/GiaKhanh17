@@ -1,0 +1,148 @@
+#include <SoftwareSerial.h>
+#include <LoRa.h>
+#include <LiquidCrystal_I2C.h>  
+#include <Wire.h>
+byte degree[8] = {
+  0B01110,
+  0B01010,
+  0B01110,
+  0B00000,
+  0B00000,
+  0B00000,
+  0B00000,
+  0B00000
+};
+#define TX 5
+#define RX 4
+#define M0 12
+#define M1 11 
+int led1=8;
+int led2=7;
+float A,B;
+LiquidCrystal_I2C lcd(0x27,20,4);
+SoftwareSerial loraSerial(TX, RX);
+String splitString(String str, String delim, uint16_t pos){
+  String tmp = str;
+  for(int i=0; i<pos; i++){
+    tmp = tmp.substring(tmp.indexOf(delim)+1);    
+    if(tmp.indexOf(delim)== -1 
+    && i != pos -1 )
+      return "";
+  }
+  return tmp.substring(0,tmp.indexOf(delim));
+}
+void setup() {
+  Serial.begin(9600);
+  lcd.backlight();
+ lcd.begin(20,4);
+ lcd.init();
+ lcd.createChar(1, degree);
+  Wire.begin();
+  loraSerial.begin(9600);
+  pinMode(M0, OUTPUT);
+  pinMode(M1, OUTPUT);
+  pinMode(led1,OUTPUT);
+  pinMode(led2,OUTPUT);
+  digitalWrite(M0, LOW);
+  digitalWrite(M1, LOW);
+}
+void loop() {
+   {  
+ String str = loraSerial.readString();
+ String nhietdo= splitString(str,":",0);
+ String doam= splitString(str, ":",1);
+ String apsuat= splitString(str, ":",2);
+ String WindSpeed= splitString(str, ":",3);
+ String WATER= splitString(str, ":",4);
+ String capdo = splitString(str, ":",5);
+ A = WATER.toFloat();
+ B = capdo.toInt();
+ Serial.println(str);
+   if(A>9999||A<0.001)
+ {
+A=0;
+ }
+ if (B>7&&A>5)
+ {
+  digitalWrite(led1,HIGH);
+  digitalWrite(led2,HIGH);
+ }
+ else if(B>7&&A<=5)
+ {
+  digitalWrite(led1,HIGH);
+  digitalWrite(led2,LOW);
+ }
+ 
+  else if (B<=7&&A>5)
+ {
+  digitalWrite(led1,LOW);
+  digitalWrite(led2,HIGH);
+ }
+ else if(B<=7&&A<=5)
+ {
+  digitalWrite(led1,LOW);
+  digitalWrite(led2,LOW);
+ }
+if (WindSpeed==0)
+{
+  lcd.clear();
+ lcd.setCursor(0, 0);
+ lcd.print("T: ");
+ lcd.print(nhietdo);
+ lcd.write(1);
+ lcd.print("C");
+ lcd.setCursor(11, 0);
+ lcd.print("H: ");
+ lcd.print(doam);
+ lcd.print("%");
+ lcd.setCursor(4, 1);
+ lcd.print("P: ");
+ lcd.print(apsuat);
+ lcd.print(" Pa");
+ lcd.setCursor(0, 2);
+ lcd.print("WS: ");
+ lcd.print(WindSpeed);
+ lcd.setCursor(9, 2);
+ lcd.print(" m/s");
+ lcd.setCursor(15, 2);
+ lcd.print("Lv:");
+ lcd.print(capdo);
+ lcd.setCursor(2, 3);
+ lcd.print("FLOW: ");
+ lcd.print(A);
+ lcd.setCursor(15, 3);
+ lcd.print("l/min"); 
+}
+else
+{
+ lcd.clear();
+ lcd.setCursor(0, 0);
+ lcd.print("T: ");
+ lcd.print(nhietdo);
+ lcd.write(1);
+ lcd.print("C");
+ lcd.setCursor(11, 0);
+ lcd.print("H: ");
+ lcd.print(doam);
+ lcd.print("%");
+ lcd.setCursor(4, 1);
+ lcd.print("P: ");
+ lcd.print(apsuat);
+ lcd.print(" Pa");
+ lcd.setCursor(0, 2);
+ lcd.print("WS: ");
+ lcd.print(WindSpeed);
+ lcd.setCursor(9, 2);
+ lcd.print(" m/s");
+ lcd.setCursor(15, 2);
+ lcd.print("Lv:");
+ lcd.print(capdo);
+ lcd.setCursor(2, 3);
+ lcd.print("FLOW: ");
+ lcd.print(A);
+ lcd.setCursor(15, 3);
+ lcd.print("l/min");
+}
+}
+delay(1000);
+}
