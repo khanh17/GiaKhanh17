@@ -1,0 +1,123 @@
+#include <SoftwareSerial.h>
+#include <LoRa.h>
+#include <Adafruit_Sensor.h>
+#include <Adafruit_BME280.h>
+#include <Wire.h>
+#define SEALEVELPRESSURE_HPA (1013.25)
+#define TX 12
+#define RX 11
+#define M0 9
+#define M1 10 
+Adafruit_BME280 bme;
+SoftwareSerial loraSerial(TX, RX);
+#define READ_TIME 1000 
+#define WIND_SENSOR_PIN 2 
+#define WIND_SPEED_20_PULSE_SECOND 1.75  
+#define ONE_ROTATION_SENSOR 20.0
+volatile unsigned long Rotations; 
+float WindSpeed; 
+unsigned long gulStart_Read_Timer = 0;
+int X;
+int Y;
+float TIME = 0;
+float FREQUENCY = 0;
+float WATER = 0;
+float A;
+float LS = 0;
+const int input = A0;
+String rdata;
+int capdogio;
+void setup() {
+  Serial.begin(9600);
+  Wire.begin();
+!bme.begin(0x76);
+  loraSerial.begin(9600);
+  pinMode(M0, OUTPUT);
+  pinMode(M1, OUTPUT);
+  digitalWrite(M0, LOW);
+  digitalWrite(M1, LOW);
+  pinMode(input,INPUT);
+   pinMode(WIND_SENSOR_PIN,INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(WIND_SENSOR_PIN),isr_rotation, CHANGE);
+   sei();
+  gulStart_Read_Timer - millis();
+}
+void loop() {
+    float a = bme.readTemperature();
+    float b = bme.readHumidity();
+    float c = bme.readPressure() / 100.0F;
+  X = pulseIn(input, HIGH);
+  Y = pulseIn(input, LOW);
+  TIME = X + Y;
+  FREQUENCY = 1000000/TIME;
+  WATER = FREQUENCY/7.5;
+  A= abs(WATER);
+  LS = WATER/60;
+    if((millis() - gulStart_Read_Timer) >= READ_TIME)
+  {
+    cli(); //Disable interrupts  
+    //convert rotation to wind speed in m/s
+    WindSpeed = WIND_SPEED_20_PULSE_SECOND/ONE_ROTATION_SENSOR*(float)Rotations;   
+    sei(); //Enables interrupts
+    Rotations = 0; //Set Rotations count to 0 ready for calculations
+    gulStart_Read_Timer = millis(); 
+    if(WindSpeed >=0 && WindSpeed <= 0.2){
+      capdogio= 0;
+    }
+    if(WindSpeed >0.2 && WindSpeed <= 1.5){
+      capdogio= 1;
+    }
+     if(WindSpeed >1.5 && WindSpeed <= 3.2){
+      capdogio= 2;
+    }
+      if(WindSpeed >3.2 && WindSpeed <= 5.4){
+      capdogio= 3;
+    }
+     if(WindSpeed >5.4 && WindSpeed <= 7.9){
+      capdogio= 4;
+     }
+      if(WindSpeed >7.9 && WindSpeed <= 10.7){
+      capdogio= 5;
+     }
+     if(WindSpeed >10.7 && WindSpeed <= 13.8){
+      capdogio= 6;
+     }
+      if(WindSpeed >13.8 && WindSpeed <= 17.1){
+      capdogio= 7;
+     }
+ if(WindSpeed >17.1 && WindSpeed <= 20.7){
+      capdogio= 8;
+     }
+      if(WindSpeed >20.7 && WindSpeed <= 24.4){
+      capdogio= 9;
+     }
+     if(WindSpeed >24.4 && WindSpeed <= 28.4){
+      capdogio= 10;
+     }
+      if(WindSpeed >28.4 && WindSpeed <= 32.6){
+      capdogio= 11;
+     }
+ if(WindSpeed >32.6 && WindSpeed <= 36.9){
+      capdogio= 12;
+     }
+      if(WindSpeed >36.9 && WindSpeed <= 41.4){
+      capdogio= 13;
+     }
+     if(WindSpeed >41.4 && WindSpeed <= 46.1){
+      capdogio= 14;
+     }
+      if(WindSpeed >46.1){
+      capdogio= 15;
+     }
+}               
+ Serial.readString();
+  rdata=rdata+a+":"+b+":"+c+":"+WindSpeed+":"+A+":"+capdogio+":";
+  Serial.println(rdata);
+  loraSerial.print(rdata);
+  rdata="";
+  delay(100);
+}
+void isr_rotation()
+{
+    Rotations++;
+}
