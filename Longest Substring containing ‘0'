@@ -1,0 +1,23 @@
+#include<iostream>
+using namespace std;
+int maxlength(string s){
+    int size=s.length();
+    int count,ans=0;
+    for(int i=0;i<=size-1;i++){
+        if(s[i]=='0'){
+            int count=1;
+            for(int j=i+1;j<=size-1 && s[j]=='0';j++){
+                count++;
+            }
+        ans=max(ans,count);    
+        }
+    }
+    
+    return ans;
+}
+
+int main(){
+    string s="01100011";
+    maxlength(s);
+    cout << maxlength(s);
+}
