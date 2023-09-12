@@ -3,10 +3,10 @@ using namespace std;
 int maxlength(string s){
     int size=s.length();
     int count,ans=0;
-    for(int i=0;i<=size-1;i++){
+    for(int i=0;i<size;i++){
         if(s[i]=='0'){
             int count=1;
-            for(int j=i+1;j<=size-1 && s[j]=='0';j++){
+            for(int j=i+1;j<size && s[j]=='0';j++){
                 count++;
             }
         ans=max(ans,count);    
