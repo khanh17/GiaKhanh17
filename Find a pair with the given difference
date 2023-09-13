@@ -1,0 +1,26 @@
+#include <iostream>
+using namespace std;
+void two_different(int a[],int length,int diff){
+  for(int i=0;i<length;i++){
+      for(int j=0;j<length;j++){
+          if(i==j){
+              continue;
+          }
+          if(a[i]+diff==a[j]){
+              cout <<"pair number: " << a[i] <<" and " <<a[j];
+              return ;
+          }
+        
+}
+}
+    cout<<"no such pair";
+}
+int main() {
+    int a[] = {5, 20, 3, 80, 50, 2,15};
+    int length=sizeof a/sizeof a[0];
+    int diff;
+    cout <<"input your different number:";
+    cin >> diff;
+    two_different(a,length,diff);
+    return 0;
+}
