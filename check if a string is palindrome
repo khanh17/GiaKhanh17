@@ -1,0 +1,28 @@
+#include<iostream>
+#include<bits/stdc++.h>
+using namespace std;
+int palindrome(string s ){
+	int length=s.length();
+	string temp=s;
+	int i=0;
+	int j=length-1;
+	while(i<j){
+		swap(s[i],s[j]);
+		i++;
+		j--;
+	}
+	if(temp==s){
+		cout<<temp <<" is a palindrome" <<endl;
+	}
+	else{
+		cout<<temp <<" is not a palindrome" <<endl;
+	}
+	return 0;
+}
+
+int main(){
+	string s;
+	palindrome("abba");
+	palindrome("abcdcba");
+	palindrome("giakhanh");
+}
