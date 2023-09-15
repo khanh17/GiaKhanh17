@@ -1,0 +1,31 @@
+#include<iostream>
+#include<bits/stdc++.h>
+using namespace std;
+
+void sum_subarray(int a[],int length,int sum){
+	for(int i=0;i<length;i++){
+		int temp=a[i];
+		if(temp==sum){
+			cout<<"sum found at index" << i;
+			return;
+		}
+		for(int j=i+1;j<length;j++){
+			temp+=a[j];
+			if(temp==sum){
+				cout<<"sum found at indexes " <<i <<" and " <<j;
+				return;
+			}
+		}
+	}
+	cout <<"no subarray found !";
+	return;	
+
+}
+int main(){
+	int a[] = { 1,4,20,3,10,5 };
+	int sum;
+	cin >>sum;
+	int length=sizeof a/sizeof a[0];
+	sum_subarray(a,length,sum);
+	
+}
